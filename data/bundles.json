@@ -1,0 +1,14 @@
+{
+  "frontend": ["frontend-design", "ui-ux-pro-max", "react-best-practices", "web-accessibility"],
+  "backend": ["backend-dev-guidelines", "api-patterns", "database-design"],
+  "marketing": ["copywriting", "page-cro", "seo-audit"],
+  "security": ["vulnerability-scanner", "security-review", "api-security-best-practices"],
+  "product": ["ai-product", "product-requirements", "brainstorming"],
+  "fullstack": ["frontend-design", "backend-dev-guidelines", "database-design", "api-patterns"],
+  "devops": ["devops-troubleshooter", "cicd-automation-workflow-automate", "docker-expert", "kubernetes-architect", "deployment-pipeline-design"],
+  "testing": ["test-driven-development", "playwright-expert", "e2e-testing"],
+  "data-science": ["data-analysis", "machine-learning", "python-expert"],
+  "mobile": ["react-native-expert", "mobile-ux"],
+  "documentation": ["technical-writing", "api-documentation"],
+  "performance": ["performance-optimization", "web-performance"]
+}

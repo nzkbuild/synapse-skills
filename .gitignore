@@ -1,0 +1,32 @@
+# Local skills library (installed by synapse setup)
+.agent/skills/
+
+# Synapse cache
+.cache/
+
+# Feedback & profiles (user-local)
+.router_feedback.json
+.project_profiles.json
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Env
+.env
+.env.local
+.gemini/
+
+# Test cache
+.pytest_cache/
+
+# Session data
+.agent/session-memory.md
+.agent/routing-diary/
