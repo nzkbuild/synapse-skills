@@ -1,0 +1,93 @@
+"""Synapse configuration — paths, constants, defaults."""
+import os
+import sys
+from pathlib import Path
+
+# Version check
+if sys.version_info < (3, 8):
+    print("Error: Python 3.8+ required. You have {}.{}.{}".format(*sys.version_info[:3]), file=sys.stderr)
+    sys.exit(1)
+
+# Constants
+DEFAULT_MAX_SKILLS = 3
+MAX_SKILLS = 5
+MAX_TASK_LENGTH = 2000
+FEEDBACK_CAP = 10
+MIN_SCORE = 2
+RELATIVE_THRESHOLD = 0.7
+HEAVY_SKILLS = {"loki-mode"}
+
+# Paths
+PACKAGE_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = PACKAGE_ROOT.parent
+
+
+def get_synapse_home():
+    """Return Synapse data directory (~/.codex/.synapse/)."""
+    codex_home = os.getenv("CODEX_HOME", "").strip()
+    if codex_home:
+        return Path(codex_home) / ".synapse"
+    return Path.home() / ".codex" / ".synapse"
+
+
+def get_skills_root():
+    """Resolve skills root directory."""
+    # 1. Environment variable
+    for env_var in ("SYNAPSE_SKILLS_ROOT", "ANTIGRAVITY_SKILLS_ROOT"):
+        env_root = os.getenv(env_var, "").strip()
+        if env_root:
+            env_path = Path(env_root)
+            if (env_path / "skills_index.json").exists():
+                return env_path
+
+    # 2. Repo .agent/skills
+    repo_skills = REPO_ROOT / ".agent" / "skills"
+    if (repo_skills / "skills_index.json").exists():
+        return repo_skills
+
+    # 3. CWD .agent/skills
+    cwd_skills = Path.cwd() / ".agent" / "skills"
+    if (cwd_skills / "skills_index.json").exists():
+        return cwd_skills
+
+    # 4. Default codex location
+    codex_home = os.getenv("CODEX_HOME", "").strip()
+    if not codex_home:
+        codex_home = str(Path.home() / ".codex")
+    codex_skills = Path(codex_home) / "skills"
+    if (codex_skills / "skills_index.json").exists():
+        return codex_skills
+
+    return repo_skills
+
+
+def get_feedback_path():
+    """Return path to feedback JSON file."""
+    return Path.home() / ".codex" / ".router_feedback.json"
+
+
+def get_bundles_path():
+    """Return path to bundles.json."""
+    # Check package data/ directory first
+    pkg_bundles = PACKAGE_ROOT.parent / "data" / "bundles.json"
+    if pkg_bundles.exists():
+        return pkg_bundles
+    # Fallback to repo root
+    return REPO_ROOT / "bundles.json"
+
+
+DEFAULT_BUNDLES = {
+    "frontend": ["frontend-design", "ui-ux-pro-max", "react-best-practices", "web-accessibility"],
+    "backend": ["backend-dev-guidelines", "api-patterns", "database-design"],
+    "marketing": ["copywriting", "page-cro", "seo-audit"],
+    "security": ["vulnerability-scanner", "security-review", "api-security-best-practices"],
+    "product": ["ai-product", "product-requirements", "brainstorming"],
+    "fullstack": ["frontend-design", "backend-dev-guidelines", "database-design", "api-patterns"],
+    "devops": ["devops-troubleshooter", "cicd-automation-workflow-automate", "docker-expert",
+               "kubernetes-architect", "deployment-pipeline-design"],
+    "testing": ["test-driven-development", "playwright-expert", "e2e-testing"],
+    "data-science": ["data-analysis", "machine-learning", "python-expert"],
+    "mobile": ["react-native-expert", "mobile-ux"],
+    "documentation": ["technical-writing", "api-documentation"],
+    "performance": ["performance-optimization", "web-performance"],
+}
