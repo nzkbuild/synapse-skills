@@ -6,7 +6,6 @@ weights based on accumulated outcomes. Per-skill, per-project tracking.
 import json
 import sys
 from datetime import datetime
-from pathlib import Path
 
 from synapse.config import (
     GROOVE_MAX_BOOST, GROOVE_MIN_RATINGS,
