@@ -122,4 +122,8 @@ DEFAULT_BUNDLES = {
     "mobile": ["react-native-expert", "mobile-ux"],
     "documentation": ["technical-writing", "api-documentation"],
     "performance": ["performance-optimization", "web-performance"],
+    "ai-engineering": ["ai-product", "machine-learning", "python-expert", "data-analysis"],
+    "architecture": ["system-design", "backend-dev-guidelines", "database-design", "api-patterns"],
+    "startup": ["brainstorming", "product-requirements", "frontend-design", "backend-dev-guidelines"],
+    "refactoring": ["code-quality", "test-driven-development", "performance-optimization"],
 }

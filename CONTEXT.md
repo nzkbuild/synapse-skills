@@ -80,18 +80,18 @@ synapse/
 - Interactive TTY prompt after routing
 - Auto-boost/penalize based on outcomes (±5 max, min 3 ratings)
 
-### Phase 4 — Distribution
-- Publish to PyPI
-- `synapse setup` first-run experience (zero questions)
+### Phase 4 — Distribution ✅ DONE
+- `synapse setup` — Zero-question first-run experience
 - Auto-detect IDE + platform
 - Skills download via HTTPS (no git needed)
+- PyPI publish workflow (GitHub Actions trusted publisher)
+- CI updated with embeddings test job
 
-### Phase 5 — Ecosystem Polish
-- Expand bundles (12 → 15+)
-- New workflows: `/update-synapse`, `/skill-health`, `/recall-sessions`
-- Updated rules block for GEMINI.md
-- Update old antigravity-optimizer README → redirect
-- Migration guide
+### Phase 5 — Ecosystem Polish ✅ DONE
+- Expanded bundles: 12 → 16 (added ai-engineering, architecture, startup, refactoring)
+- Agent workflows: `/update-synapse`, `/skill-health`, `/recall-sessions`
+- `templates/GEMINI_RULES.md` — Ready-to-paste rules block
+- `MIGRATION.md` — Guide from antigravity-optimizer to synapse-skills
 
 ## Design Principles
 
