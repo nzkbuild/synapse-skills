@@ -9,10 +9,11 @@ from datetime import datetime
 from pathlib import Path
 
 from synapse.config import (
-    GROOVE_MAX_BOOST, GROOVE_MIN_RATINGS,
-    get_outcomes_path, get_last_routing_path,
+    GROOVE_MAX_BOOST,
+    GROOVE_MIN_RATINGS,
+    get_last_routing_path,
+    get_outcomes_path,
 )
-
 
 # ============================================================================
 # Data persistence

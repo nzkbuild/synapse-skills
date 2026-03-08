@@ -7,7 +7,9 @@ import sys
 
 from synapse import __version__
 from synapse.config import (
-    FEEDBACK_CAP, MAX_SKILLS, MAX_TASK_LENGTH,
+    FEEDBACK_CAP,
+    MAX_SKILLS,
+    MAX_TASK_LENGTH,
     get_skills_root,
 )
 
@@ -81,8 +83,12 @@ def main():
 
     # Lazy imports for speed
     from synapse.router import (
-        get_skill_id, load_bundles, load_feedback, load_index,
-        pick_skills, save_feedback,
+        get_skill_id,
+        load_bundles,
+        load_feedback,
+        load_index,
+        pick_skills,
+        save_feedback,
     )
 
     SKILLS_ROOT = get_skills_root()
@@ -107,7 +113,7 @@ def main():
             print(f"\n{name}:")
             for s in bskills:
                 print(f"  - {s}")
-        print(f"\nUsage: synapse --bundle <name> \"your task\"")
+        print("\nUsage: synapse --bundle <name> \"your task\"")
         print("=" * 50)
         return 0
 
@@ -196,14 +202,14 @@ def main():
         sat = stats['satisfaction_rate'] * 100
         print(f"  Satisfaction rate:  {sat:.0f}%")
         if stats['top_skills']:
-            print(f"\n  Top skills:")
+            print("\n  Top skills:")
             for sid, helpful, unhelpful, total, score in stats['top_skills'][:10]:
                 bar = "\u2588" * int(max(score + 1, 0) * 5)
                 print(f"    {sid:30s} {bar} {score:+.2f} ({helpful}\u2713/{unhelpful}\u2717)")
         if stats['worst_skills'] and stats['worst_skills'] != stats['top_skills']:
             worst = [s for s in stats['worst_skills'] if s[4] < 0][:5]
             if worst:
-                print(f"\n  Needs improvement:")
+                print("\n  Needs improvement:")
                 for sid, helpful, unhelpful, total, score in worst:
                     print(f"    {sid:30s} {score:+.2f} ({helpful}\u2713/{unhelpful}\u2717)")
         print("=" * 50)
@@ -211,7 +217,7 @@ def main():
 
     # --rate (Groove outcome)
     if args.rate:
-        from synapse.groove import record_outcome, load_last_routing, _detect_project
+        from synapse.groove import _detect_project, load_last_routing, record_outcome
         last = load_last_routing()
         if not last:
             print("Error: No recent routing to rate. Run a routing first.", file=sys.stderr)
@@ -307,7 +313,7 @@ def main():
     # Tracer: write memory
     if not args.no_memory:
         try:
-            from synapse.memory import write_session_entry, write_diary_entry
+            from synapse.memory import write_diary_entry, write_session_entry
             scores = [(n, s) for n, s, _ in explanations] if explanations else None
             write_session_entry(task, picked, args.bundle, scores)
             write_diary_entry(task, picked, args.bundle, scores)
@@ -327,11 +333,11 @@ def main():
         try:
             response = input("\nRate these skills? (g)ood / (b)ad / [enter] skip: ").strip().lower()
             if response in ("g", "good"):
-                from synapse.groove import record_outcome, _detect_project
+                from synapse.groove import _detect_project, record_outcome
                 record_outcome(picked, "good", project_name=_detect_project())
                 print("\u2705 Recorded as helpful")
             elif response in ("b", "bad"):
-                from synapse.groove import record_outcome, _detect_project
+                from synapse.groove import _detect_project, record_outcome
                 record_outcome(picked, "bad", project_name=_detect_project())
                 print("\u274c Recorded as unhelpful")
         except (EOFError, KeyboardInterrupt):

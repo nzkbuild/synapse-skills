@@ -1,7 +1,6 @@
 """Tests for synapse.groove — Outcome-based learning."""
 from unittest.mock import patch
 
-
 # ============================================================================
 # Test outcome recording
 # ============================================================================
@@ -11,7 +10,7 @@ class TestRecordOutcome:
 
     def test_record_good_outcome(self, tmp_path):
         """Recording a good outcome should increment helpful count."""
-        from synapse.groove import record_outcome, load_outcomes
+        from synapse.groove import load_outcomes, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -26,7 +25,7 @@ class TestRecordOutcome:
 
     def test_record_bad_outcome(self, tmp_path):
         """Recording a bad outcome should increment unhelpful count."""
-        from synapse.groove import record_outcome, load_outcomes
+        from synapse.groove import load_outcomes, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -38,7 +37,7 @@ class TestRecordOutcome:
 
     def test_record_multiple_skills(self, tmp_path):
         """Recording should apply to all skill IDs in the list."""
-        from synapse.groove import record_outcome, load_outcomes
+        from synapse.groove import load_outcomes, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -51,7 +50,7 @@ class TestRecordOutcome:
 
     def test_record_accumulates(self, tmp_path):
         """Multiple recordings should accumulate correctly."""
-        from synapse.groove import record_outcome, load_outcomes
+        from synapse.groove import load_outcomes, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -67,7 +66,7 @@ class TestRecordOutcome:
 
     def test_per_project_tracking(self, tmp_path):
         """Project-specific outcomes should be tracked separately."""
-        from synapse.groove import record_outcome, load_outcomes
+        from synapse.groove import load_outcomes, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -79,7 +78,7 @@ class TestRecordOutcome:
 
     def test_invalid_rating_ignored(self, tmp_path):
         """Invalid ratings should be silently ignored."""
-        from synapse.groove import record_outcome, load_outcomes
+        from synapse.groove import load_outcomes, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -98,7 +97,7 @@ class TestGrooveScoring:
 
     def test_no_scores_below_min_ratings(self, tmp_path):
         """Skills with fewer than GROOVE_MIN_RATINGS should not get a score."""
-        from synapse.groove import record_outcome, get_groove_scores
+        from synapse.groove import get_groove_scores, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -110,8 +109,8 @@ class TestGrooveScoring:
 
     def test_positive_score_after_threshold(self, tmp_path):
         """Skills exceeding min ratings with good outcomes should get positive score."""
-        from synapse.groove import record_outcome, get_groove_scores
         from synapse.config import GROOVE_MAX_BOOST
+        from synapse.groove import get_groove_scores, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -125,7 +124,7 @@ class TestGrooveScoring:
 
     def test_negative_score_for_bad_skills(self, tmp_path):
         """Skills with mostly bad outcomes should get negative score."""
-        from synapse.groove import record_outcome, get_groove_scores
+        from synapse.groove import get_groove_scores, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -137,7 +136,7 @@ class TestGrooveScoring:
 
     def test_project_specific_weighting(self, tmp_path):
         """Project-specific outcomes should be weighted 2x vs global."""
-        from synapse.groove import record_outcome, get_groove_scores
+        from synapse.groove import get_groove_scores, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -173,7 +172,7 @@ class TestStats:
 
     def test_stats_with_data(self, tmp_path):
         """Stats should compute correct aggregates."""
-        from synapse.groove import record_outcome, get_stats
+        from synapse.groove import get_stats, record_outcome
 
         outcomes_path = tmp_path / "outcomes.json"
         with patch("synapse.groove.get_outcomes_path", return_value=outcomes_path):
@@ -196,7 +195,7 @@ class TestLastRouting:
 
     def test_round_trip(self, tmp_path):
         """Save and load should produce the same data."""
-        from synapse.groove import save_last_routing, load_last_routing
+        from synapse.groove import load_last_routing, save_last_routing
 
         last_path = tmp_path / "last_routing.json"
         with patch("synapse.groove.get_last_routing_path", return_value=last_path):

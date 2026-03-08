@@ -12,9 +12,14 @@ import sys
 from pathlib import Path
 
 from synapse.config import (
-    DEFAULT_BUNDLES, DEFAULT_MAX_SKILLS, FEEDBACK_CAP, HEAVY_SKILLS,
-    MAX_SKILLS, MIN_SCORE, RELATIVE_THRESHOLD, SEMANTIC_WEIGHT,
-    get_bundles_path, get_feedback_path, get_skills_root,
+    DEFAULT_BUNDLES,
+    FEEDBACK_CAP,
+    HEAVY_SKILLS,
+    MIN_SCORE,
+    RELATIVE_THRESHOLD,
+    SEMANTIC_WEIGHT,
+    get_bundles_path,
+    get_feedback_path,
 )
 
 # ============================================================================
@@ -302,7 +307,7 @@ def pick_skills(skills, task, max_skills, feedback, bundle_set,
     groove_scores = {}
     if use_groove:
         try:
-            from synapse.groove import get_groove_scores, _detect_project
+            from synapse.groove import _detect_project, get_groove_scores
             groove_scores = get_groove_scores(project_name=_detect_project())
         except Exception:
             pass

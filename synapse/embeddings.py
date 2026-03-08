@@ -16,8 +16,11 @@ import sys
 from pathlib import Path
 
 from synapse.config import (
-    ONNX_MODEL_NAME, ONNX_MODEL_REPO, SEMANTIC_THRESHOLD,
-    get_cache_path, get_models_path,
+    ONNX_MODEL_NAME,
+    ONNX_MODEL_REPO,
+    SEMANTIC_THRESHOLD,
+    get_cache_path,
+    get_models_path,
 )
 
 logger = logging.getLogger("synapse.embeddings")

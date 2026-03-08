@@ -13,7 +13,7 @@ import tempfile
 import urllib.request
 from pathlib import Path
 
-from synapse.config import get_skills_root, PACKAGE_ROOT
+from synapse.config import PACKAGE_ROOT, get_skills_root
 
 # Skills archive URL (GitHub releases)
 SKILLS_ARCHIVE_URL = (
@@ -229,7 +229,7 @@ def run_setup(force=False):
     print(f"  Platform:  {plat}")
     print(f"  IDEs:      {', '.join(ides) if ides else 'none detected'}")
     print(f"  Skills:    {skills_root}")
-    print(f"\n  Run: synapse \"your task\" to get started!")
+    print("\n  Run: synapse \"your task\" to get started!")
     print(f"{'=' * 50}")
 
     return 0

@@ -1,6 +1,4 @@
 """Synapse Memory (Tracer) — Session memory, routing diary, and echo recall."""
-import json
-import os
 import re
 from datetime import datetime
 from pathlib import Path

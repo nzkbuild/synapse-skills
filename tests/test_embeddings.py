@@ -4,7 +4,6 @@ from unittest.mock import patch
 
 import pytest
 
-
 # ============================================================================
 # Test graceful fallback
 # ============================================================================
@@ -17,7 +16,6 @@ class TestGracefulFallback:
         # We test this by checking the fallback path in the module
         with patch.dict(sys.modules, {"onnxruntime": None, "numpy": None}):
             # Force reimport to trigger the ImportError path
-            import importlib
             # Since the module caches HAS_EMBEDDINGS at import time,
             # we test the behavior through the public API
             from synapse.embeddings import HAS_EMBEDDINGS

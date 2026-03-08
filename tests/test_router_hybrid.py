@@ -3,7 +3,6 @@ from unittest.mock import patch
 
 import pytest
 
-
 # ============================================================================
 # Test score_skill with semantic bonus
 # ============================================================================
@@ -25,8 +24,8 @@ class TestScoreSkillHybrid:
 
     def test_semantic_bonus_applied(self):
         """Semantic score should add a bonus to the keyword score."""
-        from synapse.router import score_skill
         from synapse.config import SEMANTIC_WEIGHT
+        from synapse.router import score_skill
 
         skill = {"id": "api-patterns", "description": "REST API design patterns", "tags": []}
         task_tokens = ["api", "design"]
