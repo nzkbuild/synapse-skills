@@ -8,7 +8,6 @@ Usage: synapse setup [--force]
 import os
 import platform
 import shutil
-import sys
 import tarfile
 import tempfile
 import urllib.request
@@ -172,12 +171,12 @@ def run_setup(force=False):
     print("=" * 50)
 
     # Step 1: Platform
-    print(f"\n[1/5] Detecting platform...")
+    print("\n[1/5] Detecting platform...")
     plat = detect_platform()
     print(f"  Platform: {plat}")
 
     # Step 2: IDE
-    print(f"\n[2/5] Detecting IDE...")
+    print("\n[2/5] Detecting IDE...")
     ides = detect_ide()
     if ides:
         print(f"  Found: {', '.join(ides)}")
@@ -185,7 +184,7 @@ def run_setup(force=False):
         print("  No IDE markers found (that's fine)")
 
     # Step 3: Download skills
-    print(f"\n[3/5] Installing skills...")
+    print("\n[3/5] Installing skills...")
     skills_root = get_skills_root()
     index_exists = (skills_root / "skills_index.json").exists()
     if index_exists and not force:
@@ -195,13 +194,13 @@ def run_setup(force=False):
         download_ok = download_skills(skills_root, force=force)
 
     # Step 4: Templates
-    print(f"\n[4/5] Installing templates...")
+    print("\n[4/5] Installing templates...")
     agent_dir = Path.cwd() / ".agent"
     install_templates(agent_dir)
     print("  Templates ready.")
 
     # Step 5: Verify
-    print(f"\n[5/5] Verifying installation...")
+    print("\n[5/5] Verifying installation...")
     index_path = skills_root / "skills_index.json"
     if index_path.exists():
         import json

@@ -1,8 +1,5 @@
 """Tests for synapse.groove — Outcome-based learning."""
-import json
-import pytest
 from unittest.mock import patch
-from pathlib import Path
 
 
 # ============================================================================
