@@ -205,8 +205,9 @@ def detect_task_category(task_tokens):
     return best_cat if best_count > 0 else "default"
 
 
-def score_skill(skill, task_tokens, feedback, bundle_set, semantic_score=0.0):
-    """Score a skill against task tokens (Fuse: keyword + semantic)."""
+def score_skill(skill, task_tokens, feedback, bundle_set,
+                semantic_score=0.0, groove_score=0.0):
+    """Score a skill against task tokens (Fuse: keyword + semantic + groove)."""
     name = get_skill_id(skill)
     description = skill.get("description") or ""
     path = skill.get("path") or ""
@@ -245,6 +246,11 @@ def score_skill(skill, task_tokens, feedback, bundle_set, semantic_score=0.0):
         score += semantic_bonus
         reasons.append(f"semantic:{semantic_score:.2f}")
 
+    # Groove outcome bonus/penalty
+    if abs(groove_score) > 0.01:
+        score += groove_score
+        reasons.append(f"groove:{groove_score:+.1f}")
+
     if name in bundle_set:
         score += 5
         reasons.append("bundle:+5")
@@ -268,11 +274,12 @@ def allow_heavy_skill(task_text):
 # ============================================================================
 
 def pick_skills(skills, task, max_skills, feedback, bundle_set,
-                explain=False, use_embeddings=True):
+                explain=False, use_embeddings=True, use_groove=True):
     """Select best skills for a task (Drift engine).
 
     Args:
         use_embeddings: If True, try loading semantic embeddings for hybrid scoring.
+        use_groove: If True, apply Groove outcome-based score adjustments.
     """
     task_tokens = expand_tokens(tokenize(task))
     allow_heavy = allow_heavy_skill(task)
@@ -291,6 +298,15 @@ def pick_skills(skills, task, max_skills, feedback, bundle_set,
         except Exception:
             pass  # Graceful degradation to keyword-only
 
+    # Try loading Groove scores (outcome learning)
+    groove_scores = {}
+    if use_groove:
+        try:
+            from synapse.groove import get_groove_scores, _detect_project
+            groove_scores = get_groove_scores(project_name=_detect_project())
+        except Exception:
+            pass
+
     for skill in skills:
         name = get_skill_id(skill)
         if (name in HEAVY_SKILLS) and (not allow_heavy):
@@ -300,8 +316,10 @@ def pick_skills(skills, task, max_skills, feedback, bundle_set,
             skipped_filtered.append(name)
             continue
         sem_score = semantic_scores.get(name, 0.0)
+        grv_score = groove_scores.get(name, 0.0)
         score, skill_name, reasons = score_skill(
-            skill, task_tokens, feedback, bundle_set, semantic_score=sem_score
+            skill, task_tokens, feedback, bundle_set,
+            semantic_score=sem_score, groove_score=grv_score,
         )
         scored.append((score, skill_name, reasons))
 

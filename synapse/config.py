@@ -23,6 +23,10 @@ SEMANTIC_THRESHOLD = 0.25  # Minimum cosine similarity to count as a match
 ONNX_MODEL_NAME = "all-MiniLM-L6-v2"
 ONNX_MODEL_REPO = "sentence-transformers/all-MiniLM-L6-v2"
 
+# Groove (outcome-based learning) constants
+GROOVE_MAX_BOOST = 5      # Max ±adjustment from outcomes
+GROOVE_MIN_RATINGS = 3    # Minimum ratings before score takes effect
+
 # Paths
 PACKAGE_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = PACKAGE_ROOT.parent
@@ -92,6 +96,16 @@ def get_cache_path():
     cache_dir = get_synapse_home() / "cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
     return cache_dir
+
+
+def get_outcomes_path():
+    """Return path to Groove outcomes file (~/.codex/.synapse/outcomes.json)."""
+    return get_synapse_home() / "outcomes.json"
+
+
+def get_last_routing_path():
+    """Return path to last routing result cache (for --rate)."""
+    return get_synapse_home() / "last_routing.json"
 
 
 DEFAULT_BUNDLES = {

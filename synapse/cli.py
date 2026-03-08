@@ -60,6 +60,10 @@ def parse_args():
     parser.add_argument("--why", action="store_true", help="Explain scoring")
     parser.add_argument("--no-embeddings", action="store_true",
                         help="Disable semantic matching (keyword-only)")
+    parser.add_argument("--stats", action="store_true",
+                        help="Show routing analytics (Groove)")
+    parser.add_argument("--rate", type=str, choices=["good", "bad"],
+                        metavar="RATING", help="Rate last routing (good/bad)")
     return parser.parse_args()
 
 
@@ -173,6 +177,43 @@ def main():
             print(f"No past sessions found matching \"{args.echo}\".")
         return 0
 
+    # --stats (Groove analytics)
+    if args.stats:
+        from synapse.groove import get_stats
+        stats = get_stats()
+        print("=" * 50)
+        print("SYNAPSE ROUTING ANALYTICS (Groove)")
+        print("=" * 50)
+        print(f"  Total ratings:      {stats['total_ratings']}")
+        print(f"  Skills rated:       {stats['total_skills_rated']}")
+        sat = stats['satisfaction_rate'] * 100
+        print(f"  Satisfaction rate:  {sat:.0f}%")
+        if stats['top_skills']:
+            print(f"\n  Top skills:")
+            for sid, helpful, unhelpful, total, score in stats['top_skills'][:10]:
+                bar = "\u2588" * int(max(score + 1, 0) * 5)
+                print(f"    {sid:30s} {bar} {score:+.2f} ({helpful}\u2713/{unhelpful}\u2717)")
+        if stats['worst_skills'] and stats['worst_skills'] != stats['top_skills']:
+            worst = [s for s in stats['worst_skills'] if s[4] < 0][:5]
+            if worst:
+                print(f"\n  Needs improvement:")
+                for sid, helpful, unhelpful, total, score in worst:
+                    print(f"    {sid:30s} {score:+.2f} ({helpful}\u2713/{unhelpful}\u2717)")
+        print("=" * 50)
+        return 0
+
+    # --rate (Groove outcome)
+    if args.rate:
+        from synapse.groove import record_outcome, load_last_routing, _detect_project
+        last = load_last_routing()
+        if not last:
+            print("Error: No recent routing to rate. Run a routing first.", file=sys.stderr)
+            return 1
+        record_outcome(last["skills"], args.rate, project_name=_detect_project())
+        emoji = "\u2705" if args.rate == "good" else "\u274c"
+        print(f"{emoji} Rated {', '.join(last['skills'])} as {args.rate}")
+        return 0
+
     if not task:
         print("Error: task text is required.", file=sys.stderr)
         print("Usage: synapse \"your task here\"", file=sys.stderr)
@@ -265,6 +306,29 @@ def main():
             write_diary_entry(task, picked, args.bundle, scores)
         except Exception:
             pass
+
+    # Groove: save last routing for --rate
+    if picked:
+        try:
+            from synapse.groove import save_last_routing
+            save_last_routing(picked, task)
+        except Exception:
+            pass
+
+    # Groove: interactive outcome prompt (only in TTY)
+    if picked and sys.stdin.isatty() and not args.no_clipboard:
+        try:
+            response = input("\nRate these skills? (g)ood / (b)ad / [enter] skip: ").strip().lower()
+            if response in ("g", "good"):
+                from synapse.groove import record_outcome, _detect_project
+                record_outcome(picked, "good", project_name=_detect_project())
+                print("\u2705 Recorded as helpful")
+            elif response in ("b", "bad"):
+                from synapse.groove import record_outcome, _detect_project
+                record_outcome(picked, "bad", project_name=_detect_project())
+                print("\u274c Recorded as unhelpful")
+        except (EOFError, KeyboardInterrupt):
+            pass  # Skip gracefully
 
     return 0
 
