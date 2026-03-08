@@ -81,17 +81,25 @@ synapse/
 - Auto-boost/penalize based on outcomes (±5 max, min 3 ratings)
 
 ### Phase 4 — Distribution ✅ DONE
-- `synapse setup` — Zero-question first-run experience
+- `synapse setup` — Zero-question 7-step first-run experience
 - Auto-detect IDE + platform
-- Skills download via HTTPS (no git needed)
+- Skills download via git sparse-checkout (primary) + HTTP fallback
+- `data/skills_sources.json` — 3 upstream skill repos configured
 - PyPI publish workflow (GitHub Actions trusted publisher)
 - CI updated with embeddings test job
 
 ### Phase 5 — Ecosystem Polish ✅ DONE
 - Expanded bundles: 12 → 16 (added ai-engineering, architecture, startup, refactoring)
-- Agent workflows: `/update-synapse`, `/skill-health`, `/recall-sessions`
-- `templates/GEMINI_RULES.md` — Ready-to-paste rules block
+- Agent workflows: `/activate-skills`, `/update-synapse`, `/skill-health`, `/recall-sessions`
+- Auto-install rules into `~/.gemini/GEMINI.md` (with version tracking + migration)
+- Auto-deploy workflows to user's project `.agent/workflows/`
+- `templates/GEMINI_RULES.md` — Rules block template
 - `MIGRATION.md` — Guide from antigravity-optimizer to synapse-skills
+
+### Post-Phase Audit ✅ DONE
+- Fixed `import os` in `config.py` and `from pathlib import Path` in `groove.py`
+- Fixed 37 ruff lint errors (import sorting, unused imports, empty f-strings)
+- Updated tests for new setup.py signatures
 
 ## Design Principles
 
@@ -108,7 +116,7 @@ synapse/
 - **`--recall` renamed to `--echo`** — matches Tracer feature name
 - **`--intake` renamed to `--distill`** — matches Distill feature name
 - **ONNX-only** for embeddings — no PyTorch dependency (~53MB vs ~2GB)
-- **12 bundles** expanded from original 7
+- **16 bundles** expanded from original 7
 
 ## Previous Planning Docs
 

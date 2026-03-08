@@ -1,0 +1,33 @@
+{
+    "version": "1.0.0",
+    "description": "Upstream skill sources for Synapse. Used by synapse setup to sync skills.",
+    "sources": [
+        {
+            "name": "sickn33-awesome-skills",
+            "repo": "sickn33/antigravity-awesome-skills",
+            "branch": "main",
+            "path": "skills/",
+            "type": "git-sparse",
+            "priority": 1,
+            "description": "Primary skill library with 1,200+ skills"
+        },
+        {
+            "name": "anthropic-official",
+            "repo": "anthropics/skills",
+            "branch": "main",
+            "path": "skills/",
+            "type": "git-sparse",
+            "priority": 2,
+            "description": "Official Anthropic document skills (docx, pdf, pptx, xlsx)"
+        },
+        {
+            "name": "guanyang-antigravity",
+            "repo": "guanyang/antigravity-skills",
+            "branch": "main",
+            "path": "skills/",
+            "type": "git-sparse",
+            "priority": 3,
+            "description": "Curated 57 skills including context engineering and memory systems"
+        }
+    ]
+}

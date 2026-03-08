@@ -79,17 +79,19 @@ class TestDownloadSkills:
         from synapse.setup import download_skills
         index = tmp_path / "skills_index.json"
         index.write_text("{}", encoding="utf-8")
-        # Mock urllib to fail gracefully
-        with patch("synapse.setup.urllib.request.urlretrieve", side_effect=Exception("offline")):
-            result = download_skills(tmp_path, force=True)
+        # Mock git clone to fail, then HTTP to fail
+        with patch("synapse.setup.clone_skills_from_sources", return_value=False):
+            with patch("synapse.setup.urllib.request.urlretrieve", side_effect=Exception("offline")):
+                result = download_skills(tmp_path, force=True)
         # Should fail gracefully (returns False since both download attempts fail)
         assert result is False
 
     def test_handles_offline_gracefully(self, tmp_path):
         """Should not crash when network is unavailable."""
         from synapse.setup import download_skills
-        with patch("synapse.setup.urllib.request.urlretrieve", side_effect=Exception("offline")):
-            result = download_skills(tmp_path)
+        with patch("synapse.setup.clone_skills_from_sources", return_value=False):
+            with patch("synapse.setup.urllib.request.urlretrieve", side_effect=Exception("offline")):
+                result = download_skills(tmp_path)
         assert result is False  # Failed but didn't crash
 
 
@@ -144,6 +146,8 @@ class TestRunSetup:
         with patch("synapse.setup.get_skills_root", return_value=tmp_path / "skills"):
             with patch("synapse.setup.download_skills", return_value=True):
                 with patch("synapse.setup.install_templates"):
-                    result = run_setup()
+                    with patch("synapse.setup.install_rules"):
+                        with patch("synapse.setup.deploy_workflows"):
+                            result = run_setup()
 
         assert result == 0
