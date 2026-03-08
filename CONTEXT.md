@@ -10,7 +10,7 @@
 - **CLI:** `synapse "your task"`
 - **Tagline:** Universal AI skill routing for every coding agent
 - **Previous name:** Antigravity Optimizer (repo: nzkbuild/antigravity-optimizer)
-- **Version:** 3.0.0-alpha.1
+- **Version:** 3.0.0-beta.1
 
 ## What It Does
 
@@ -21,11 +21,11 @@ Synapse is a cognitive layer between users and 1,200+ AI skills. It understands 
 | Name | What | Status |
 |---|---|---|
 | **Drift** | Invisible skill routing | ✅ Done |
-| **Fuse** | Semantic + keyword hybrid matching | ⚠️ Keyword done, semantic (ONNX) = Phase 2 |
+| **Fuse** | Semantic + keyword hybrid matching | ✅ Done (ONNX + keyword) |
 | **Marq** | Auto-detect project type, boost skills | ✅ Done |
 | **Tracer** | Session memory + diary + echo recall | ✅ Done |
 | **Distill** | Refine vague prompts into clear briefs | ✅ Done |
-| **Groove** | Outcome-based learning | ❌ Phase 3 |
+| **Groove** | Outcome-based learning | ✅ Done |
 | **Offgrid** | 100% offline, zero API keys | ✅ Done |
 | **Index** | 1,200+ skill library | ✅ Done |
 
@@ -44,6 +44,9 @@ synapse/
 ├── cli.py        — Entry point (`synapse` command)
 ├── config.py     — Paths, constants, defaults
 ├── router.py     — Core scoring + selection (Drift + Fuse)
+├── embeddings.py — Fuse semantic layer (ONNX MiniLM)
+├── tokenizer.py  — Lightweight WordPiece tokenizer
+├── groove.py     — Groove (outcome-based learning)
 ├── memory.py     — Tracer (session + diary + echo)
 ├── profiles.py   — Marq (project detection)
 ├── distill.py    — Distill (prompt refiner)
@@ -53,8 +56,9 @@ synapse/
 ## Tech Stack
 
 - Python 3.8+ (only prerequisite)
-- Optional: `onnxruntime` + `numpy` for semantic matching
+- Optional: `onnxruntime` + `numpy` for semantic matching (`pip install synapse-skills[embeddings]`)
 - No database — flat JSON + Markdown files
+- Model: `all-MiniLM-L6-v2` (ONNX, auto-downloaded on first use)
 - CI: 3 OS × 2 Python versions
 
 ## Roadmap
@@ -62,16 +66,19 @@ synapse/
 ### Phase 1 — Foundation ✅ DONE
 - Package scaffolding, all core modules, CLI, CI, README
 
-### Phase 2 — Semantic Brain (Fuse)
-- `synapse/embeddings.py` — ONNX model loader + encoder
-- Hybrid scoring: semantic similarity + keyword bonus
+### Phase 2 — Semantic Brain (Fuse) ✅ DONE
+- `synapse/embeddings.py` — ONNX model loader + encoder + caching
+- `synapse/tokenizer.py` — Standalone WordPiece tokenizer
+- Hybrid scoring: `keyword + (semantic × 8)`
 - Graceful fallback when no ONNX installed
+- `--no-embeddings` flag for opt-out
 
-### Phase 3 — Intelligence (Groove)
+### Phase 3 — Intelligence (Groove) ✅ DONE
+- `synapse/groove.py` — Outcome tracking per skill per project
 - `--stats` command for routing analytics
-- Outcome prompt: "Did these skills help?"
-- Auto-boost/penalize based on outcomes
-- Skill quality scoring
+- `--rate good/bad` for explicit ratings
+- Interactive TTY prompt after routing
+- Auto-boost/penalize based on outcomes (±5 max, min 3 ratings)
 
 ### Phase 4 — Distribution
 - Publish to PyPI
