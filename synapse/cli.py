@@ -58,6 +58,8 @@ def parse_args():
     parser.add_argument("--search", type=str, metavar="KEYWORD", help="Search skills")
     parser.add_argument("--info", type=str, metavar="SKILL_ID", help="Skill details")
     parser.add_argument("--why", action="store_true", help="Explain scoring")
+    parser.add_argument("--no-embeddings", action="store_true",
+                        help="Disable semantic matching (keyword-only)")
     return parser.parse_args()
 
 
@@ -164,7 +166,7 @@ def main():
         from synapse.memory import echo
         results = echo(args.echo)
         if results:
-            print(f"\u{1f4d4} Tracer found {len(results)} past sessions:\n")
+            print(f"\U0001f4d4 Tracer found {len(results)} past sessions:\n")
             for r in results:
                 print(f"  {r['date']} {r['time']}: \"{r['task']}\" \u2192 {r['skills']}")
         else:
@@ -215,8 +217,9 @@ def main():
                   file=sys.stderr)
 
     # Drift: pick skills
-    picked, explanations, skipped_heavy, skipped_filtered = pick_skills(
-        skills, task, max_skills, feedback, bundle_set, explain=args.why
+    picked, explanations, skipped_heavy, skipped_filtered, semantic_on = pick_skills(
+        skills, task, max_skills, feedback, bundle_set,
+        explain=args.why, use_embeddings=not args.no_embeddings,
     )
 
     # --feedback
@@ -239,6 +242,8 @@ def main():
 
     # --why explanations
     if args.why:
+        mode_label = "semantic+keyword" if semantic_on else "keyword-only"
+        print(f"[why] Scoring mode: {mode_label}", file=sys.stderr)
         if skipped_heavy:
             print(f"[why] Skipped heavy: {', '.join(sorted(set(skipped_heavy)))}", file=sys.stderr)
         if skipped_filtered:

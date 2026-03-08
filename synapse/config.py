@@ -17,6 +17,12 @@ MIN_SCORE = 2
 RELATIVE_THRESHOLD = 0.7
 HEAVY_SKILLS = {"loki-mode"}
 
+# Semantic embedding constants
+SEMANTIC_WEIGHT = 8       # Multiplier for semantic similarity score (0-8 bonus)
+SEMANTIC_THRESHOLD = 0.25  # Minimum cosine similarity to count as a match
+ONNX_MODEL_NAME = "all-MiniLM-L6-v2"
+ONNX_MODEL_REPO = "sentence-transformers/all-MiniLM-L6-v2"
+
 # Paths
 PACKAGE_ROOT = Path(__file__).resolve().parent
 REPO_ROOT = PACKAGE_ROOT.parent
@@ -74,6 +80,18 @@ def get_bundles_path():
         return pkg_bundles
     # Fallback to repo root
     return REPO_ROOT / "bundles.json"
+
+
+def get_models_path():
+    """Return path to bundled ONNX models directory."""
+    return PACKAGE_ROOT / "models"
+
+
+def get_cache_path():
+    """Return path to Synapse cache directory (~/.codex/.synapse/cache/)."""
+    cache_dir = get_synapse_home() / "cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    return cache_dir
 
 
 DEFAULT_BUNDLES = {

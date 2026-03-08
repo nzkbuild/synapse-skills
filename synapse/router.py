@@ -13,7 +13,7 @@ from pathlib import Path
 
 from synapse.config import (
     DEFAULT_BUNDLES, DEFAULT_MAX_SKILLS, FEEDBACK_CAP, HEAVY_SKILLS,
-    MAX_SKILLS, MIN_SCORE, RELATIVE_THRESHOLD,
+    MAX_SKILLS, MIN_SCORE, RELATIVE_THRESHOLD, SEMANTIC_WEIGHT,
     get_bundles_path, get_feedback_path, get_skills_root,
 )
 
@@ -205,8 +205,8 @@ def detect_task_category(task_tokens):
     return best_cat if best_count > 0 else "default"
 
 
-def score_skill(skill, task_tokens, feedback, bundle_set):
-    """Score a skill against task tokens (Fuse keyword layer)."""
+def score_skill(skill, task_tokens, feedback, bundle_set, semantic_score=0.0):
+    """Score a skill against task tokens (Fuse: keyword + semantic)."""
     name = get_skill_id(skill)
     description = skill.get("description") or ""
     path = skill.get("path") or ""
@@ -239,6 +239,12 @@ def score_skill(skill, task_tokens, feedback, bundle_set):
             if f"tag:{token}" not in reasons:
                 reasons.append(f"tag:{token}")
 
+    # Semantic similarity bonus (Fuse semantic layer)
+    if semantic_score > 0:
+        semantic_bonus = semantic_score * SEMANTIC_WEIGHT
+        score += semantic_bonus
+        reasons.append(f"semantic:{semantic_score:.2f}")
+
     if name in bundle_set:
         score += 5
         reasons.append("bundle:+5")
@@ -261,11 +267,29 @@ def allow_heavy_skill(task_text):
 # Skill Selection (Drift)
 # ============================================================================
 
-def pick_skills(skills, task, max_skills, feedback, bundle_set, explain=False):
-    """Select best skills for a task (Drift engine)."""
+def pick_skills(skills, task, max_skills, feedback, bundle_set,
+                explain=False, use_embeddings=True):
+    """Select best skills for a task (Drift engine).
+
+    Args:
+        use_embeddings: If True, try loading semantic embeddings for hybrid scoring.
+    """
     task_tokens = expand_tokens(tokenize(task))
     allow_heavy = allow_heavy_skill(task)
     scored, skipped_heavy, skipped_filtered = [], [], []
+
+    # Try loading semantic scores (Fuse semantic layer)
+    semantic_scores = {}
+    semantic_active = False
+    if use_embeddings:
+        try:
+            from synapse.embeddings import get_embedder
+            embedder = get_embedder()
+            if embedder:
+                semantic_scores = embedder.score_skills_semantic(task, skills)
+                semantic_active = True
+        except Exception:
+            pass  # Graceful degradation to keyword-only
 
     for skill in skills:
         name = get_skill_id(skill)
@@ -275,7 +299,10 @@ def pick_skills(skills, task, max_skills, feedback, bundle_set, explain=False):
         if should_filter_security(task_tokens, name):
             skipped_filtered.append(name)
             continue
-        score, skill_name, reasons = score_skill(skill, task_tokens, feedback, bundle_set)
+        sem_score = semantic_scores.get(name, 0.0)
+        score, skill_name, reasons = score_skill(
+            skill, task_tokens, feedback, bundle_set, semantic_score=sem_score
+        )
         scored.append((score, skill_name, reasons))
 
     scored.sort(key=lambda item: item[0], reverse=True)
@@ -303,4 +330,4 @@ def pick_skills(skills, task, max_skills, feedback, bundle_set, explain=False):
         else:
             picked = [scored[0][1]] if scored else []
 
-    return picked, explanations, skipped_heavy, skipped_filtered
+    return picked, explanations, skipped_heavy, skipped_filtered, semantic_active

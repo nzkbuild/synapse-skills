@@ -15,6 +15,10 @@ __pycache__/
 dist/
 build/
 
+# ONNX model files (auto-downloaded on first use)
+synapse/models/*.onnx
+synapse/models/tokenizer_config.json
+
 # OS
 Thumbs.db
 .DS_Store
