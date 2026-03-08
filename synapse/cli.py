@@ -64,6 +64,8 @@ def parse_args():
                         help="Show routing analytics (Groove)")
     parser.add_argument("--rate", type=str, choices=["good", "bad"],
                         metavar="RATING", help="Rate last routing (good/bad)")
+    parser.add_argument("--force", action="store_true",
+                        help="Force re-download during setup")
     return parser.parse_args()
 
 
@@ -71,6 +73,11 @@ def main():
     args = parse_args()
     max_skills = max(1, min(args.max, MAX_SKILLS))
     task = " ".join(args.task or []).strip()
+
+    # synapse setup — first-run experience
+    if task.lower() == "setup":
+        from synapse.setup import run_setup
+        return run_setup(force=args.force)
 
     # Lazy imports for speed
     from synapse.router import (
